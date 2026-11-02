@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>幾A幾B - 版本二：多局與猜測歷史</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+    .container { max-width: 650px; width: 100%; display: flex; flex-direction: column; gap: 16px; }
+
+    .nav-bar { margin-bottom: 4px; }
+    .nav-link { color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .nav-link:hover { text-decoration: underline; }
+    
+    .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid var(--border); }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+    .title { font-size: 1.25rem; font-weight: bold; }
+    
+    .btn { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.9rem; }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    
+    .debug-bar { background: #f1f5f9; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.9rem; }
+    .debug-secret { font-family: monospace; font-weight: bold; color: var(--danger); letter-spacing: 2px; }
+
+    .input-group { display: flex; gap: 8px; margin-bottom: 12px; }
+    .input-group input { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1.1rem; letter-spacing: 2px; text-align: center; }
+    
+    .alert { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 16px; display: none; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
+    th { background: #f8fafc; font-weight: 600; }
+
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color: white; }
+    .badge-active { background: var(--primary); }
+    .badge-success { background: var(--success); }
+    .badge-unfinished { background: var(--warning); }
+
+    .round-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; background: #fff; }
+    .round-header { background: #f8fafc; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; border-bottom: 1px solid var(--border); }
+    .round-body { padding: 12px; }
+    .empty-msg { text-align: center; color: #94a3b8; padding: 12px 0; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="nav-bar">
+    <a href="../index.html" class="nav-link">← 返回開發歷程總覽</a>
+  </div>
+
+  <!-- 當前遊戲區 -->
+  <div class="card">
+    <div class="header">
+      <div class="title">幾A幾B (版本二：目前局)</div>
+      <button class="btn" onclick="startNewRound()">開新局</button>
+    </div>
+
+    <div class="debug-bar">
+      <label style="cursor: pointer;">
+        <input type="checkbox" id="debugToggle" onchange="toggleDebug(this.checked)"> 開啟除錯模式
+      </label>
+      <div id="debugDisplay" style="display: none;">
+        答案：<span id="debugAnswer" class="debug-secret">----</span>
+      </div>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <div class="input-group">
+      <input type="text" id="guessInput" placeholder="請輸入4位不重複數字 (例: 0123)" maxlength="4" onkeydown="if(event.key==='Enter') submitGuess()">
+      <button class="btn" id="submitBtn" onclick="submitGuess()">送出猜測</button>
+    </div>
+
+    <div id="currentRoundLogs">
+      <div class="empty-msg">準備就緒，請開始輸入數字。</div>
+    </div>
+  </div>
+
+  <!-- 多局歷史紀錄區 -->
+  <div class="card">
+    <div class="header">
+      <div class="title">多局歷史紀錄 (重新整理頁面即重置)</div>
+    </div>
+    <div id="historyContainer">
+      <div class="empty-msg">尚無歷史紀錄。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let rounds = []; 
+  let currentRoundIndex = -1;
+  let debugMode = false;
+
+  function generateSecret() {
+    const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    let secret = '';
+    for (let i = 0; i < 4; i++) {
+      const idx = Math.floor(Math.random() * digits.length);
+      secret += digits.splice(idx, 1)[0];
+    }
+    return secret;
+  }
+
+  function validateInput(val) {
+    if (!val || val.length !== 4) return "請輸入剛好 4 位數字！";
+    if (!/^\d{4}$/.test(val)) return "輸入包含非數字字元！";
+    if (new Set(val).size !== 4) return "數字不能重複！";
+    return null;
+  }
+
+  function startNewRound() {
+    if (currentRoundIndex >= 0 && rounds[currentRoundIndex].status === '進行中') {
+      rounds[currentRoundIndex].status = '未完成';
+    }
+
+    const newRound = {
+      id: rounds.length + 1,
+      secret: generateSecret(),
+      status: '進行中',
+      guesses: []
+    };
+
+    rounds.push(newRound);
+    currentRoundIndex = rounds.length - 1;
+    
+    debugMode = false;
+    document.getElementById('debugToggle').checked = false;
+    
+    hideAlert();
+    document.getElementById('guessInput').value = '';
+    document.getElementById('guessInput').disabled = false;
+    document.getElementById('submitBtn').disabled = false;
+
+    render();
+  }
+
+  function submitGuess() {
+    const inputEl = document.getElementById('guessInput');
+    const val = inputEl.value.trim();
+
+    const error = validateInput(val);
+    if (error) {
+      showAlert(error);
+      return;
+    }
+    hideAlert();
+
+    const curRound = rounds[currentRoundIndex];
+    if (curRound.status !== '進行中') return;
+
+    let a = 0, b = 0;
+    for (let i = 0; i < 4; i++) {
+      if (val[i] === curRound.secret[i]) a++;
+      else if (curRound.secret.includes(val[i])) b++;
+    }
+
+    const timeStr = new Date().toTimeString().split(' ')[0];
+    curRound.guesses.push({
+      seq: curRound.guesses.length + 1,
+      val: val,
+      result: `${a}A${b}B`,
+      time: timeStr
+    });
+
+    if (a === 4) {
+      curRound.status = '已完成';
+      inputEl.disabled = true;
+      document.getElementById('submitBtn').disabled = true;
+    }
+
+    inputEl.value = '';
+    render();
+  }
+
+  function toggleDebug(enabled) {
+    debugMode = enabled;
+    renderDebugView();
+  }
+
+  function renderDebugView() {
+    const displayEl = document.getElementById('debugDisplay');
+    const answerEl = document.getElementById('debugAnswer');
+    if (debugMode && currentRoundIndex >= 0) {
+      displayEl.style.display = 'block';
+      answerEl.textContent = rounds[currentRoundIndex].secret;
+    } else {
+      displayEl.style.display = 'none';
+    }
+  }
+
+  function showAlert(msg) {
+    const alertBox = document.getElementById('alertBox');
+    alertBox.textContent = msg;
+    alertBox.style.display = 'block';
+  }
+
+  function hideAlert() {
+    document.getElementById('alertBox').style.display = 'none';
+  }
+
+  function render() {
+    renderDebugView();
+    const curRound = rounds[currentRoundIndex];
+    const currentLogsEl = document.getElementById('currentRoundLogs');
+
+    if (!curRound || curRound.guesses.length === 0) {
+      currentLogsEl.innerHTML = `<div class="empty-msg">${curRound?.status === '已完成' ? '本局已完成！' : '目前尚無猜測紀錄'}</div>`;
+    } else {
+      let tableHtml = `<table><thead><tr><th>次序</th><th>猜測數字</th><th>判定結果</th><th>時間</th></tr></thead><tbody>`;
+      curRound.guesses.forEach(g => {
+        tableHtml += `<tr><td>${g.seq}</td><td><strong>${g.val}</strong></td><td>${g.result}</td><td>${g.time}</td></tr>`;
+      });
+      tableHtml += `</tbody></table>`;
+      currentLogsEl.innerHTML = tableHtml;
+    }
+
+    const historyContainer = document.getElementById('historyContainer');
+    let historyHtml = '';
+    for (let i = rounds.length - 1; i >= 0; i--) {
+      const r = rounds[i];
+      let badgeClass = 'badge-unfinished';
+      if (r.status === '進行中') badgeClass = 'badge-active';
+      if (r.status === '已完成') badgeClass = 'badge-success';
+
+      historyHtml += `
+        <div class="round-item">
+          <div class="round-header">
+            <span>第 ${r.id} 局 ${i === currentRoundIndex ? '(目前局)' : ''}</span>
+            <span class="badge ${badgeClass}">${r.status}</span>
+          </div>
+          <div class="round-body">
+      `;
+
+      if (r.guesses.length === 0) {
+        historyHtml += `<div class="empty-msg">此局無有效猜測紀錄</div>`;
+      } else {
+        historyHtml += `<table><thead><tr><th>次序</th><th>猜測數字</th><th>結果</th><th>時間</th></tr></thead><tbody>`;
+        r.guesses.forEach(g => {
+          historyHtml += `<tr><td>${g.seq}</td><td>${g.val}</td><td>${g.result}</td><td>${g.time}</td></tr>`;
+        });
+        historyHtml += `</tbody></table>`;
+      }
+      historyHtml += `</div></div>`;
+    }
+    historyContainer.innerHTML = historyHtml;
+  }
+
+  startNewRound();
+</script>
+
+</body>
+</html>

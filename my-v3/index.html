@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>幾A幾B - 版本三：代號與 GAS 雲端存檔</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; }
+    .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+
+    .nav-bar { margin-bottom: 4px; }
+    .nav-link { color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .nav-link:hover { text-decoration: underline; }
+    
+    .card { background: var(--card-bg); border-radius: 12px; padding: 28px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); text-align: center; }
+    .title { font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; color: #0f172a; }
+    .desc { color: var(--text-sub); line-height: 1.6; margin-bottom: 24px; font-size: 0.95rem; text-align: left; }
+    
+    .info-box { background: #f1f5f9; padding: 16px; border-radius: 8px; font-size: 0.9rem; color: #334155; text-align: left; margin-bottom: 24px; border-left: 4px solid var(--primary); }
+    .info-box ul { padding-left: 20px; margin-top: 8px; }
+
+    .btn-launch { display: inline-block; width: 100%; background: var(--primary); color: white; text-decoration: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1.1rem; transition: background 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+    .btn-launch:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="nav-bar">
+    <a href="../index.html" class="nav-link">← 返回開發歷程總覽</a>
+  </div>
+
+  <div class="card">
+    <div class="title">版本三｜代號與 GAS 雲端存檔</div>
+    
+    <div class="desc">
+      本版本已成功結合 Google Apps Script (GAS) 與 Google 試算表雲端資料庫。玩家只要輸入相同的使用者代號，即可跨裝置讀取歷史紀錄與繼續未完成的局。
+    </div>
+
+    <div class="info-box">
+      <strong>📌 版本三測試功能重點：</strong>
+      <ul>
+        <li><strong>雲端代號認證</strong>：使用代號查詢歷程（非密碼登入）。</li>
+        <li><strong>自動儲存</strong>：每次有效猜測即時自動同步至 Google 試算表。</li>
+        <li><strong>除錯模式</strong>：支援獨立開關檢視當前局真實答案。</li>
+        <li><strong>續玩機制</strong>：未完成局在重新開啟頁面後仍可繼續猜測。</li>
+      </ul>
+    </div>
+
+    <!-- 請將下面的網址替換成你的 GAS 部署 /exec 網址 -->
+    <a href="https://script.google.com/macros/s/AKfycbxL36YO4bN264094JJJM81E0aPVB6Juw3uobEJb4za3LhUEkUypVxwcMyLVsNkm8-6N4Q/exec" target="_blank" class="btn-launch">
+      🚀 開啟版本三雲端遊戲頁面 (/exec)
+    </a>
+  </div>
+</div>
+
+</body>
+</html>
