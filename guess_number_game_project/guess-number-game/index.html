@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數位科技概論｜幾A幾B 遊戲開發歷程導覽</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; }
+    .container { max-width: 800px; width: 100%; display: flex; flex-direction: column; gap: 24px; }
+    
+    .header { text-align: center; margin-bottom: 12px; }
+    .header h1 { font-size: 2rem; color: #0f172a; margin-bottom: 8px; }
+    .header p { color: var(--text-sub); font-size: 1rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; }
+    
+    .card { background: var(--card-bg); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+
+    .card-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-title { font-size: 1.2rem; font-weight: bold; color: #0f172a; }
+    
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: white; }
+    .badge-done { background: var(--success); }
+    .badge-pending { background: var(--warning); }
+
+    .card-desc { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 20px; }
+    .card-desc ul { padding-left: 20px; margin-top: 8px; }
+
+    .btn { display: block; text-align: center; background: var(--primary); color: white; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+    .btn:hover { background: #1d4ed8; }
+    .btn-disabled { background: #94a3b8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>數位科技概論｜幾A幾B 專案開發歷程</h1>
+    <p>從基本遊戲到雲端存檔：四階段演進與功能版本展示</p>
+  </div>
+
+  <div class="grid">
+    <!-- 版本一 -->
+    <div class="card">
+      <div>
+        <div class="card-title-row">
+          <span class="card-title">版本一｜基本遊戲與除錯模式</span>
+          <span class="badge badge-done">已完成</span>
+        </div>
+        <div class="card-desc">
+          提供單局猜數字功能，支援4位不重複數字（含首位0），並提供獨立開關且不干擾狀態的除錯模式。
+          <ul>
+            <li>輸入格式嚴格驗證</li>
+            <li>單局當次結果即時回傳</li>
+            <li>可隨時切換除錯開關觀看答案</li>
+          </ul>
+        </div>
+      </div>
+      <a href="./my-v1/index.html" class="btn">前往測試 版本一</a>
+    </div>
+
+    <!-- 版本二 -->
+    <div class="card">
+      <div>
+        <div class="card-title-row">
+          <span class="card-title">版本二｜多局與猜測歷史</span>
+          <span class="badge badge-done">已完成</span>
+        </div>
+        <div class="card-desc">
+          延續第一版，加入多局遊戲紀錄與開新局機制，保留未完成局狀態與各局歷史列表。
+          <ul>
+            <li>支援多局管理與未完成標示</li>
+            <li>詳細記錄每次猜測次序與時間</li>
+            <li>重新整理後完全重置清空</li>
+          </ul>
+        </div>
+      </div>
+      <a href="./my-v2/index.html" class="btn">前往測試 版本二</a>
+    </div>
+
+    <!-- 版本三 -->
+    <div class="card">
+      <div>
+        <div class="card-title-row">
+          <span class="card-title">版本三｜代號與 GAS 雲端存檔</span>
+          <span class="badge badge-pending">規劃中</span>
+        </div>
+        <div class="card-desc">
+          結合 Google Apps Script 與 Google 試算表，透過使用者代號自動連線存檔與跨裝置讀取。
+          <ul>
+            <li>自訂使用者代號讀回資料</li>
+            <li>有效猜測自動備份至雲端</li>
+            <li>未完成局支援接續作答</li>
+          </ul>
+        </div>
+      </div>
+      <a href="./my-v3/index.html" class="btn btn-disabled">進入預留頁</a>
+    </div>
+
+    <!-- 版本四 -->
+    <div class="card">
+      <div>
+        <div class="card-title-row">
+          <span class="card-title">版本四｜Google 帳號與個人存檔</span>
+          <span class="badge badge-pending">規劃中</span>
+        </div>
+        <div class="card-desc">
+          進階雲端整合，免輸入代號，直接透過 Google 帳號授權自動建立與綁定個人專屬雲端試算表。
+          <ul>
+            <li>Google OAuth 帳號驗證</li>
+            <li>自動創建個人雲端資料庫</li>
+            <li>多帳號資料隔離與安全驗證</li>
+          </ul>
+        </div>
+      </div>
+      <a href="./my-v4/index.html" class="btn btn-disabled">進入預留頁</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

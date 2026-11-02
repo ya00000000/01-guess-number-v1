@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>幾A幾B - 版本一：基本遊戲與除錯模式</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+    .container { max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 16px; }
+    
+    .nav-bar { margin-bottom: 4px; }
+    .nav-link { color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .nav-link:hover { text-decoration: underline; }
+
+    .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid var(--border); }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+    .title { font-size: 1.25rem; font-weight: bold; }
+    
+    .btn { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.9rem; }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    
+    .debug-bar { background: #f1f5f9; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.9rem; }
+    .debug-secret { font-family: monospace; font-weight: bold; color: var(--danger); letter-spacing: 2px; }
+
+    .input-group { display: flex; gap: 8px; margin-bottom: 12px; }
+    .input-group input { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1.1rem; letter-spacing: 2px; text-align: center; }
+    
+    .alert { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 16px; display: none; }
+    .success-box { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 6px; font-size: 1rem; text-align: center; font-weight: bold; margin-bottom: 16px; display: none; }
+
+    .result-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+    .result-val { font-size: 2rem; font-weight: bold; color: var(--primary); margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="nav-bar">
+    <a href="../index.html" class="nav-link">← 返回開發歷程總覽</a>
+  </div>
+
+  <div class="card">
+    <div class="header">
+      <div class="title">幾A幾B (版本一)</div>
+      <button class="btn" onclick="initGame()">重新開始</button>
+    </div>
+
+    <!-- 除錯模式控制 -->
+    <div class="debug-bar">
+      <label style="cursor: pointer;">
+        <input type="checkbox" id="debugToggle" onchange="toggleDebug(this.checked)"> 開啟除錯模式
+      </label>
+      <div id="debugDisplay" style="display: none;">
+        真實答案：<span id="debugAnswer" class="debug-secret">----</span>
+      </div>
+    </div>
+
+    <!-- 提示與訊息區 -->
+    <div id="alertBox" class="alert"></div>
+    <div id="successBox" class="success-box">🎉 恭喜答對！完成本局作答。</div>
+
+    <!-- 輸入區 -->
+    <div class="input-group">
+      <input type="text" id="guessInput" placeholder="請輸入4位數字 (例: 0123)" maxlength="4" onkeydown="if(event.key==='Enter') submitGuess()">
+      <button class="btn" id="submitBtn" onclick="submitGuess()">送出</button>
+    </div>
+
+    <!-- 當次判定結果 -->
+    <div class="result-card">
+      <div style="font-size: 0.85rem; color: #64748b;">當次猜測判定結果</div>
+      <div id="resultDisplay" class="result-val">--</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let secretAnswer = "";
+  let debugMode = false;
+
+  // 產生 4 位數不重複數字 (支援 0 開頭)
+  function generateSecret() {
+    const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    let secret = '';
+    for (let i = 0; i < 4; i++) {
+      const idx = Math.floor(Math.random() * digits.length);
+      secret += digits.splice(idx, 1)[0];
+    }
+    return secret;
+  }
+
+  // 初始化遊戲
+  function initGame() {
+    secretAnswer = generateSecret();
+    debugMode = false;
+    document.getElementById('debugToggle').checked = false;
+    document.getElementById('guessInput').value = '';
+    document.getElementById('guessInput').disabled = false;
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('resultDisplay').textContent = '--';
+    hideAlert();
+    document.getElementById('successBox').style.display = 'none';
+    renderDebugView();
+  }
+
+  // 驗證輸入格式
+  function validateInput(val) {
+    if (!val || val.length !== 4) return "請輸入剛好 4 位數字！";
+    if (!/^\d{4}$/.test(val)) return "輸入包含非數字字元！";
+    if (new Set(val).size !== 4) return "數字不能重複！";
+    return null;
+  }
+
+  // 送出猜測
+  function submitGuess() {
+    const inputEl = document.getElementById('guessInput');
+    const val = inputEl.value.trim();
+
+    const error = validateInput(val);
+    if (error) {
+      showAlert(error);
+      return;
+    }
+    hideAlert();
+
+    let a = 0, b = 0;
+    for (let i = 0; i < 4; i++) {
+      if (val[i] === secretAnswer[i]) a++;
+      else if (secretAnswer.includes(val[i])) b++;
+    }
+
+    const resultStr = `${a}A${b}B`;
+    document.getElementById('resultDisplay').textContent = `${val} ➔ ${resultStr}`;
+
+    if (a === 4) {
+      document.getElementById('successBox').style.display = 'block';
+      inputEl.disabled = true;
+      document.getElementById('submitBtn').disabled = true;
+    }
+
+    inputEl.value = '';
+  }
+
+  // 除錯模式切換 (不重置、不更換答案)
+  function toggleDebug(enabled) {
+    debugMode = enabled;
+    renderDebugView();
+  }
+
+  function renderDebugView() {
+    const displayEl = document.getElementById('debugDisplay');
+    const answerEl = document.getElementById('debugAnswer');
+    if (debugMode) {
+      displayEl.style.display = 'block';
+      answerEl.textContent = secretAnswer;
+    } else {
+      displayEl.style.display = 'none';
+    }
+  }
+
+  function showAlert(msg) {
+    const box = document.getElementById('alertBox');
+    box.textContent = msg;
+    box.style.display = 'block';
+  }
+
+  function hideAlert() {
+    document.getElementById('alertBox').style.display = 'none';
+  }
+
+  // 啟動首局
+  initGame();
+</script>
+
+</body>
+</html>
