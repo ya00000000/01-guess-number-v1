@@ -3,18 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>幾A幾B - 版本四：開發中預留頁</title>
+  <title>幾A幾B - 版本四：Google 帳號與個人存檔</title>
   <style>
-    body { font-family: sans-serif; background: #f8fafc; color: #1e293b; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-    a { color: #2563eb; text-decoration: none; margin-top: 16px; display: inline-block; font-weight: bold; }
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; }
+    .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+
+    .nav-bar { margin-bottom: 4px; }
+    .nav-link { color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .nav-link:hover { text-decoration: underline; }
+    
+    .card { background: var(--card-bg); border-radius: 12px; padding: 28px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); text-align: center; }
+    .title { font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; color: #0f172a; }
+    .desc { color: var(--text-sub); line-height: 1.6; margin-bottom: 24px; font-size: 0.95rem; text-align: left; }
+    
+    .info-box { background: #f1f5f9; padding: 16px; border-radius: 8px; font-size: 0.9rem; color: #334155; text-align: left; margin-bottom: 24px; border-left: 4px solid var(--primary); }
+    .info-box ul { padding-left: 20px; margin-top: 8px; }
+
+    .btn-launch { display: inline-block; width: 100%; background: var(--primary); color: white; text-decoration: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1.1rem; transition: background 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+    .btn-launch:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>🚧 功能開發中</h2>
-    <p style="margin-top: 12px; color: #64748b;">本階段版本（版本四：Google 帳號與個人存檔）功能尚在規劃與實作中，敬請期待！</p>
-    <a href="../index.html">← 返回開發歷程總覽</a>
+
+<div class="container">
+  <div class="nav-bar">
+    <a href="../index.html" class="nav-link">← 返回開發歷程總覽</a>
   </div>
+
+  <div class="card">
+    <div class="title">版本四｜Google 帳號與個人存檔</div>
+    
+    <div class="desc">
+      本版本為進階雲端整合版。玩家無需輸入代號，直接透過 Google 帳號授權登入。程式會自動在玩家個人雲端硬碟建立專屬的「幾A幾B」試算表存檔，實現完全獨立的資料隔離。
+    </div>
+
+    <div class="info-box">
+      <strong>📌 版本四測試功能重點：</strong>
+      <ul>
+        <li><strong>Google 帳號整合</strong>：免手動輸入代號，自動辨識登入身分。</li>
+        <li><strong>個人獨立存檔</strong>：自動於玩家雲端建立個人專屬試算表。</li>
+        <li><strong>資料隔離</strong>：不同 Google 帳號資料完全分開，無法存取他人歷程。</li>
+        <li><strong>除錯模式</strong>：支援讀取個人雲端當前局真實答案。</li>
+      </ul>
+    </div>
+
+    <!-- 請將下方網址替換為版本四部署的 /exec 網址 -->
+    <a href="https://script.google.com/macros/s/AKfycbxSalOAv2uzK6WqJYYLpLRvZl69dFoSbs9UqcxPByj5JXE9K_lIssPPHigjdS9Dv7Jm/exec"_blank" class="btn-launch">
+      🚀 開啟版本四雲端遊戲頁面 (/exec)
+    </a>
+  </div>
+</div>
+
 </body>
 </html>
